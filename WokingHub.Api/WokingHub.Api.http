@@ -1,0 +1,6 @@
+@WokingHub.Api_HostAddress = http://localhost:5122
+
+GET {{WokingHub.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
