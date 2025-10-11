@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:papaya_racing/features/standing/presentation/cubit/standings_cubit.dart';
 import 'package:papaya_racing/features/standing/presentation/cubit/standings_state.dart';
+import 'package:papaya_racing/features/standing/presentation/widgets/constructor_standing_card.widget.dart';
 import 'package:papaya_racing/features/standing/presentation/widgets/driver_standing_card.widget.dart';
 import 'package:papaya_racing/features/standing/presentation/widgets/season_resume_card.widget.dart';
 import 'package:papaya_racing/injection_container.dart' as di;
@@ -27,7 +28,6 @@ class StandingScreenContent extends StatelessWidget {
     return BlocBuilder<StandingsCubit, StandingsState>(
       builder: (context, state) {
         if (state is StandingsLoading) {
-          // État de chargement
           return const Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -39,7 +39,6 @@ class StandingScreenContent extends StatelessWidget {
             ),
           );
         } else if (state is StandingsError) {
-          // État d'erreur
           return Center(
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -66,71 +65,181 @@ class StandingScreenContent extends StatelessWidget {
             ),
           );
         } else if (state is StandingsLoaded) {
-          // État chargé avec données
-          return RefreshIndicator(
-            onRefresh: () async {
-              // Pull to refresh
-              await context.read<StandingsCubit>().loadStandings(2025);
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  SeasonResumeCard(
-                    season: state.season,
-                    round: state.round,
-                    leader:
-                        '${state.driverStandings.first.driver.givenName} ${state.driverStandings.first.driver.familyName}',
-                    pointsGap: state.pointsGap,
-                  ),
-                  _DriversList(state: state),
-                ],
+          return Column(
+            children: [
+              // 1️⃣ TabBar
+              Container(
+                color: F1TeamColors.mclaren.primary,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _TabButton(
+                        icon: Icons.person,
+                        label: 'PILOTES',
+                        isSelected: state.selectedTab == StandingTab.drivers,
+                        onTap: () {
+                          context.read<StandingsCubit>().selectTab(
+                            StandingTab.drivers,
+                          );
+                        },
+                      ),
+                    ),
+                    Expanded(
+                      child: _TabButton(
+                        icon: Icons.emoji_events,
+                        label: 'CONSTRUCTEURS',
+                        isSelected:
+                            state.selectedTab == StandingTab.constructors,
+                        onTap: () {
+                          context.read<StandingsCubit>().selectTab(
+                            StandingTab.constructors,
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
+
+              // 2️⃣ SeasonResumeCard dynamique
+              Container(
+                color: F1SemanticColors.grey100,
+                padding: const EdgeInsets.all(16),
+                child: state.selectedTab == StandingTab.drivers
+                    ? _buildDriversResumeCard(state)
+                    : _buildConstructorsResumeCard(state),
+              ),
+
+              // 3️⃣ Contenu du tab
+              Expanded(
+                child: RefreshIndicator(
+                  onRefresh: () async {
+                    await context.read<StandingsCubit>().loadStandings(2025);
+                  },
+                  child: state.selectedTab == StandingTab.drivers
+                      ? _DriversTab(state: state)
+                      : _ConstructorsTab(state: state),
+                ),
+              ),
+            ],
           );
         }
-        return const Center(child: Text('Bienvenue ! 🏎️'));
+        return const SizedBox.shrink();
       },
+    );
+  }
+
+  Widget _buildDriversResumeCard(StandingsLoaded state) {
+    final pointsGap = state.driverStandings.length >= 2
+        ? state.driverStandings[0].points - state.driverStandings[1].points
+        : 0;
+
+    return SeasonResumeCard(
+      season: state.season,
+      round: state.round,
+      leader:
+          '${state.driverStandings.first.driver.givenName} ${state.driverStandings.first.driver.familyName}',
+      pointsGap: pointsGap,
+      leaderPoints: state.driverStandings.first.points,
+      totalItems: state.driverStandings.length,
+      selectedTab: state.selectedTab,
+    );
+  }
+
+  Widget _buildConstructorsResumeCard(StandingsLoaded state) {
+    final pointsGap = state.constructorStandings.length >= 2
+        ? state.constructorStandings[0].points -
+              state.constructorStandings[1].points
+        : 0;
+
+    return SeasonResumeCard(
+      season: state.season,
+      round: state.round,
+      leader: state.constructorStandings.first.constructor.name,
+      leaderPoints: state.constructorStandings.first.points,
+      pointsGap: pointsGap,
+      totalItems: state.constructorStandings.length,
+      selectedTab: state.selectedTab,
     );
   }
 }
 
-class _DriversList extends StatelessWidget {
-  final StandingsLoaded state;
+class _TabButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
 
-  const _DriversList({required this.state});
+  const _TabButton({
+    required this.icon,
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(
+              color: isSelected ? Colors.white : Colors.transparent,
+              width: 3,
+            ),
+          ),
+        ),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(height: 16),
-            ...state.driverStandings.map((standing) {
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: DriverStandingCard(
-                  driverName: standing.driver.familyName,
-                  teamName: standing.constructors.first.name,
-                  driverCountry: _getCountryName(standing.driver.nationality),
-                  standingRanking: standing.position,
-                  colorAccent: _getTeamColor(
-                    standing.constructors.first.constructorId,
-                  ),
-                  points: standing.points,
-                  racesWon: standing.wins,
-                ),
-              );
-            }),
+            Icon(icon, color: isSelected ? Colors.white : Colors.white70),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? Colors.white : Colors.white70,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                fontSize: 16,
+              ),
+            ),
           ],
         ),
       ),
     );
   }
+}
 
-  /// Mapper les constructorId vers les couleurs F1
+class _DriversTab extends StatelessWidget {
+  final StandingsLoaded state;
+  const _DriversTab({required this.state});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: state.driverStandings.length,
+      itemBuilder: (context, index) {
+        final standing = state.driverStandings[index];
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: DriverStandingCard(
+            driverName: standing.driver.familyName,
+            teamName: standing.constructors.first.name,
+            driverCountry: _getCountryName(standing.driver.nationality),
+            standingRanking: standing.position,
+            colorAccent: _getTeamColor(
+              standing.constructors.first.constructorId,
+            ),
+            points: standing.points,
+            racesWon: standing.wins,
+          ),
+        );
+      },
+    );
+  }
+
   F1TeamColors _getTeamColor(String constructorId) {
     switch (constructorId.toLowerCase()) {
       case 'mclaren':
@@ -151,13 +260,11 @@ class _DriversList extends StatelessWidget {
         return F1TeamColors.rb;
       case 'sauber':
         return F1TeamColors.sauber;
-      case 'haas':
       default:
         return F1TeamColors.haas;
     }
   }
 
-  /// Mapper les nationalités vers les noms de pays en français
   String _getCountryName(String nationality) {
     switch (nationality.toLowerCase()) {
       case 'australian':
@@ -170,34 +277,68 @@ class _DriversList extends StatelessWidget {
         return 'Monaco';
       case 'spanish':
         return 'Espagne';
-      case 'mexican':
-        return 'Mexique';
-      case 'thai':
-        return 'Thaïlande';
       case 'french':
         return 'France';
       case 'german':
         return 'Allemagne';
-      case 'finnish':
-        return 'Finlande';
-      case 'danish':
-        return 'Danemark';
-      case 'canadian':
-        return 'Canada';
-      case 'japanese':
-        return 'Japon';
-      case 'chinese':
-        return 'Chine';
-      case 'new zealander':
-        return 'Nouvelle-Zélande';
       case 'italian':
         return 'Italie';
       case 'brazilian':
         return 'Brésil';
-      case 'argentine':
-        return 'Argentine';
       default:
-        return nationality; // Fallback
+        return nationality;
+    }
+  }
+}
+
+class _ConstructorsTab extends StatelessWidget {
+  final StandingsLoaded state;
+  const _ConstructorsTab({required this.state});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: state.constructorStandings.length,
+      itemBuilder: (context, index) {
+        final standing = state.constructorStandings[index];
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: ConstructorStandingCard(
+            position: standing.position,
+            constructorName: standing.constructor.name,
+            nationality: standing.constructor.nationality,
+            points: standing.points,
+            wins: standing.wins,
+            teamColor: _getTeamColor(standing.constructor.constructorId),
+          ),
+        );
+      },
+    );
+  }
+
+  F1TeamColors _getTeamColor(String constructorId) {
+    switch (constructorId.toLowerCase()) {
+      case 'mclaren':
+        return F1TeamColors.mclaren;
+      case 'red_bull':
+        return F1TeamColors.redBull;
+      case 'ferrari':
+        return F1TeamColors.ferrari;
+      case 'mercedes':
+        return F1TeamColors.mercedes;
+      case 'aston_martin':
+        return F1TeamColors.astonMartin;
+      case 'alpine':
+        return F1TeamColors.alpine;
+      case 'williams':
+        return F1TeamColors.williams;
+      case 'rb':
+        return F1TeamColors.rb;
+      case 'sauber':
+        return F1TeamColors.sauber;
+      default:
+        return F1TeamColors.haas;
     }
   }
 }
