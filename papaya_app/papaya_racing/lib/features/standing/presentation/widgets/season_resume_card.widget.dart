@@ -8,21 +8,72 @@ class SeasonResumeCard extends StatelessWidget {
   final String leader;
   final int leaderPoints;
   final int pointsGap;
-  final int totalItems;
-  final int totalRaces;
   final StandingTab selectedTab;
 
-  const SeasonResumeCard({
+  final int? totalDrivers;
+  final int? totalConstructors;
+
+  static const int totalRaces = 22;
+
+  const SeasonResumeCard._({
     super.key,
     required this.season,
     required this.round,
     required this.leader,
-    required this.pointsGap,
     required this.leaderPoints,
-    required this.totalItems,
+    required this.pointsGap,
     required this.selectedTab,
-    this.totalRaces = 24,
+    this.totalDrivers,
+    this.totalConstructors,
   });
+
+  factory SeasonResumeCard.forDrivers({
+    Key? key,
+    required String season,
+    required String round,
+    required String leader,
+    required int leaderPoints,
+    required int pointsGap,
+    required int totalDrivers,
+  }) {
+    return SeasonResumeCard._(
+      key: key,
+      season: season,
+      round: round,
+      leader: leader,
+      leaderPoints: leaderPoints,
+      pointsGap: pointsGap,
+      selectedTab: StandingTab.drivers,
+      totalDrivers: totalDrivers,
+    );
+  }
+
+  factory SeasonResumeCard.forConstructors({
+    Key? key,
+    required String season,
+    required String round,
+    required String leader,
+    required int leaderPoints,
+    required int pointsGap,
+    required int totalConstructors,
+  }) {
+    return SeasonResumeCard._(
+      key: key,
+      season: season,
+      round: round,
+      leader: leader,
+      leaderPoints: leaderPoints,
+      pointsGap: pointsGap,
+      selectedTab: StandingTab.constructors,
+      totalConstructors: totalConstructors,
+    );
+  }
+
+  int get totalItems {
+    return selectedTab == StandingTab.drivers
+        ? totalDrivers!
+        : totalConstructors!;
+  }
 
   @override
   Widget build(BuildContext context) {

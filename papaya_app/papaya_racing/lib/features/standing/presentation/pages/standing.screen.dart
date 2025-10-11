@@ -134,15 +134,14 @@ class StandingScreenContent extends StatelessWidget {
         ? state.driverStandings[0].points - state.driverStandings[1].points
         : 0;
 
-    return SeasonResumeCard(
+    return SeasonResumeCard.forDrivers(
       season: state.season,
       round: state.round,
       leader:
           '${state.driverStandings.first.driver.givenName} ${state.driverStandings.first.driver.familyName}',
       pointsGap: pointsGap,
       leaderPoints: state.driverStandings.first.points,
-      totalItems: state.driverStandings.length,
-      selectedTab: state.selectedTab,
+      totalDrivers: state.driverStandings.length,
     );
   }
 
@@ -152,14 +151,13 @@ class StandingScreenContent extends StatelessWidget {
               state.constructorStandings[1].points
         : 0;
 
-    return SeasonResumeCard(
+    return SeasonResumeCard.forConstructors(
       season: state.season,
       round: state.round,
       leader: state.constructorStandings.first.constructor.name,
       leaderPoints: state.constructorStandings.first.points,
       pointsGap: pointsGap,
-      totalItems: state.constructorStandings.length,
-      selectedTab: state.selectedTab,
+      totalConstructors: state.constructorStandings.length,
     );
   }
 }
