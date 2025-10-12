@@ -67,41 +67,79 @@ class StandingScreenContent extends StatelessWidget {
         } else if (state is StandingsLoaded) {
           return Column(
             children: [
-              // 1️⃣ TabBar
               Container(
-                color: F1TeamColors.mclaren.primary,
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: _TabButton(
-                        icon: Icons.person,
-                        label: 'PILOTES',
-                        isSelected: state.selectedTab == StandingTab.drivers,
-                        onTap: () {
-                          context.read<StandingsCubit>().selectTab(
-                            StandingTab.drivers,
-                          );
-                        },
-                      ),
-                    ),
-                    Expanded(
-                      child: _TabButton(
-                        icon: Icons.emoji_events,
-                        label: 'CONSTRUCTEURS',
-                        isSelected:
-                            state.selectedTab == StandingTab.constructors,
-                        onTap: () {
-                          context.read<StandingsCubit>().selectTab(
-                            StandingTab.constructors,
-                          );
-                        },
-                      ),
-                    ),
-                  ],
+                margin: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                ).copyWith(top: 16),
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: F1TeamColors.mclaren.primary.withOpacity(0.5),
+                ),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final halfWidth = (constraints.maxWidth / 2) - 4;
+                    return Stack(
+                      children: [
+                        AnimatedAlign(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                          alignment: state.selectedTab == StandingTab.drivers
+                              ? Alignment.centerLeft
+                              : Alignment.centerRight,
+                          child: Container(
+                            width: halfWidth,
+                            height: 36,
+                            decoration: BoxDecoration(
+                              color: F1SemanticColors.white,
+                              borderRadius: BorderRadius.circular(6),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.2),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _TabButton(
+                                icon: Icons.person,
+                                label: 'PILOTES',
+                                isSelected:
+                                    state.selectedTab == StandingTab.drivers,
+                                onTap: () {
+                                  context.read<StandingsCubit>().selectTab(
+                                    StandingTab.drivers,
+                                  );
+                                },
+                              ),
+                            ),
+                            Expanded(
+                              child: _TabButton(
+                                icon: Icons.emoji_events,
+                                label: 'CONSTRUCTEURS',
+                                isSelected:
+                                    state.selectedTab ==
+                                    StandingTab.constructors,
+                                onTap: () {
+                                  context.read<StandingsCubit>().selectTab(
+                                    StandingTab.constructors,
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ),
 
-              // 2️⃣ SeasonResumeCard dynamique
               Container(
                 color: F1SemanticColors.grey100,
                 padding: const EdgeInsets.all(16),
@@ -110,7 +148,6 @@ class StandingScreenContent extends StatelessWidget {
                     : _buildConstructorsResumeCard(state),
               ),
 
-              // 3️⃣ Contenu du tab
               Expanded(
                 child: RefreshIndicator(
                   onRefresh: () async {
@@ -179,27 +216,21 @@ class _TabButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              color: isSelected ? Colors.white : Colors.transparent,
-              width: 3,
-            ),
-          ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+      splashColor: Colors.transparent,
+      highlightColor: Colors.transparent,
+      child: SizedBox(
+        height: 36,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          spacing: 4,
           children: [
-            Icon(icon, color: isSelected ? Colors.white : Colors.white70),
-            const SizedBox(height: 4),
+            Icon(icon, color: isSelected ? Colors.orange : Colors.white),
             Text(
               label,
               style: TextStyle(
-                color: isSelected ? Colors.white : Colors.white70,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                fontSize: 16,
+                color: isSelected ? Colors.orange : Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 10,
               ),
             ),
           ],

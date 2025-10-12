@@ -13,7 +13,7 @@ class SeasonResumeCard extends StatelessWidget {
   final int? totalDrivers;
   final int? totalConstructors;
 
-  static const int totalRaces = 22;
+  static const int totalRaces = 24;
 
   const SeasonResumeCard._({
     super.key,

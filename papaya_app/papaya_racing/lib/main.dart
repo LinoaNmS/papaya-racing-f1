@@ -5,13 +5,8 @@ import 'package:papaya_racing/features/standing/presentation/pages/standing.scre
 import 'injection_container.dart' as di; // ⬅️ AJOUTÉ
 
 void main() async {
-  // ⬅️ AJOUTÉ async
-  // ⚠️ OBLIGATOIRE pour SharedPreferences
   WidgetsFlutterBinding.ensureInitialized();
-
-  // ⚠️ CRITIQUE : Initialiser GetIt
   await di.init();
-
   runApp(F1ThemeProvider(theme: F1Theme.mclaren, child: const MyApp()));
 }
 
