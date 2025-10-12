@@ -3,9 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:papaya_racing/features/standing/presentation/cubit/standings_cubit.dart';
 import 'package:papaya_racing/features/standing/presentation/cubit/standings_state.dart';
-import 'package:papaya_racing/features/standing/presentation/widgets/constructor_standing_card.widget.dart';
-import 'package:papaya_racing/features/standing/presentation/widgets/driver_standing_card.widget.dart';
 import 'package:papaya_racing/features/standing/presentation/widgets/season_resume_card.widget.dart';
+import 'package:papaya_racing/features/standing/presentation/widgets/standing_details.card.dart';
 import 'package:papaya_racing/injection_container.dart' as di;
 
 class StandingScreen extends StatelessWidget {
@@ -242,6 +241,7 @@ class _TabButton extends StatelessWidget {
 
 class _DriversTab extends StatelessWidget {
   final StandingsLoaded state;
+
   const _DriversTab({required this.state});
 
   @override
@@ -253,10 +253,10 @@ class _DriversTab extends StatelessWidget {
         final standing = state.driverStandings[index];
         return Padding(
           padding: const EdgeInsets.only(bottom: 8),
-          child: DriverStandingCard(
+          child: StandingListTile.forDriver(
             driverName: standing.driver.familyName,
             teamName: standing.constructors.first.name,
-            driverCountry: _getCountryName(standing.driver.nationality),
+            country: _getCountryName(standing.driver.nationality),
             standingRanking: standing.position,
             colorAccent: _getTeamColor(
               standing.constructors.first.constructorId,
@@ -322,10 +322,36 @@ class _DriversTab extends StatelessWidget {
 
 class _ConstructorsTab extends StatelessWidget {
   final StandingsLoaded state;
+
   const _ConstructorsTab({required this.state});
 
   @override
   Widget build(BuildContext context) {
+    String _getCountryName(String nationality) {
+      switch (nationality.toLowerCase()) {
+        case 'australian':
+          return 'Australie';
+        case 'british':
+          return 'Royaume-Uni';
+        case 'dutch':
+          return 'Pays-Bas';
+        case 'monegasque':
+          return 'Monaco';
+        case 'spanish':
+          return 'Espagne';
+        case 'french':
+          return 'France';
+        case 'german':
+          return 'Allemagne';
+        case 'italian':
+          return 'Italie';
+        case 'brazilian':
+          return 'Brésil';
+        default:
+          return nationality;
+      }
+    }
+
     return ListView.builder(
       padding: const EdgeInsets.all(16),
       itemCount: state.constructorStandings.length,
@@ -333,13 +359,13 @@ class _ConstructorsTab extends StatelessWidget {
         final standing = state.constructorStandings[index];
         return Padding(
           padding: const EdgeInsets.only(bottom: 8),
-          child: ConstructorStandingCard(
-            position: standing.position,
-            constructorName: standing.constructor.name,
-            nationality: standing.constructor.nationality,
+          child: StandingListTile.forConstructor(
+            standingRanking: standing.position,
+            teamName: standing.constructor.name,
+            country: _getCountryName(standing.constructor.nationality),
             points: standing.points,
-            wins: standing.wins,
-            teamColor: _getTeamColor(standing.constructor.constructorId),
+            racesWon: standing.wins,
+            colorAccent: _getTeamColor(standing.constructor.constructorId),
           ),
         );
       },
