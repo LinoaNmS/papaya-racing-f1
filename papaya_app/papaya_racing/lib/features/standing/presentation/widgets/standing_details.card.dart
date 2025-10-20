@@ -10,7 +10,6 @@ class StandingListTile extends StatelessWidget {
   final F1TeamColors colorAccent;
   final int points;
   final int racesWon;
-
   final String? driverName;
 
   const StandingListTile._({
@@ -83,7 +82,7 @@ class StandingListTile extends StatelessWidget {
                   textColor: colorAccent.onPrimary,
                 ),
                 _DetailsStanding(
-                  driverName: driverName,
+                  driverName: driverName?.toUpperCase(),
                   teamName: teamName,
                   driverCountry: country,
                 ),
@@ -110,139 +109,6 @@ class _DetailsStanding extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    CountryFlag _getFlagEmoji(String country) {
-      switch (country.toLowerCase()) {
-        case "australie":
-          return CountryFlag.fromCountryCode(
-            "AU",
-            theme: const ImageTheme(
-              shape: RoundedRectangle(4),
-              width: 18,
-              height: 14,
-            ),
-          );
-        case "pays-bas":
-          return CountryFlag.fromCountryCode(
-            "NL",
-            theme: const ImageTheme(
-              shape: RoundedRectangle(4),
-              width: 18,
-              height: 14,
-            ),
-          );
-        case "monaco":
-          return CountryFlag.fromCountryCode(
-            "MC",
-            theme: const ImageTheme(
-              shape: RoundedRectangle(4),
-              width: 18,
-              height: 14,
-            ),
-          );
-        case "espagne":
-          return CountryFlag.fromCountryCode(
-            "ES",
-            theme: const ImageTheme(
-              shape: RoundedRectangle(4),
-              width: 18,
-              height: 14,
-            ),
-          );
-        case "canada":
-          return CountryFlag.fromCountryCode(
-            "CA",
-            theme: const ImageTheme(
-              shape: RoundedRectangle(4),
-              width: 18,
-              height: 14,
-            ),
-          );
-        case 'allemagne':
-          return CountryFlag.fromCountryCode(
-            "DE",
-            theme: const ImageTheme(
-              shape: RoundedRectangle(4),
-              width: 18,
-              height: 14,
-            ),
-          );
-        case 'brésil':
-          return CountryFlag.fromCountryCode(
-            "BR",
-            theme: const ImageTheme(
-              shape: RoundedRectangle(4),
-              width: 18,
-              height: 14,
-            ),
-          );
-        case "italie":
-          return CountryFlag.fromCountryCode(
-            "IT",
-            theme: const ImageTheme(
-              shape: RoundedRectangle(4),
-              width: 18,
-              height: 14,
-            ),
-          );
-
-        case "france":
-          return CountryFlag.fromCountryCode(
-            "FR",
-            theme: const ImageTheme(
-              shape: RoundedRectangle(4),
-              width: 18,
-              height: 14,
-            ),
-          );
-        case "japon":
-          return CountryFlag.fromCountryCode(
-            "JP",
-            theme: const ImageTheme(
-              shape: RoundedRectangle(4),
-              width: 18,
-              height: 14,
-            ),
-          );
-        case "thaïlande":
-          return CountryFlag.fromCountryCode(
-            "TH",
-            theme: const ImageTheme(
-              shape: RoundedRectangle(4),
-              width: 18,
-              height: 14,
-            ),
-          );
-        case "argentine":
-          return CountryFlag.fromCountryCode(
-            "AR",
-            theme: const ImageTheme(
-              shape: RoundedRectangle(4),
-              width: 18,
-              height: 14,
-            ),
-          );
-        case 'nouvelle-zélande':
-          return CountryFlag.fromCountryCode(
-            "NZ",
-            theme: const ImageTheme(
-              shape: RoundedRectangle(4),
-              width: 18,
-              height: 14,
-            ),
-          );
-        case "royaume-uni":
-        default:
-          return CountryFlag.fromCountryCode(
-            "GB",
-            theme: const ImageTheme(
-              shape: RoundedRectangle(4),
-              width: 18,
-              height: 14,
-            ),
-          );
-      }
-    }
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -250,13 +116,17 @@ class _DetailsStanding extends StatelessWidget {
           Text(driverName!, style: TextStyle(fontWeight: FontWeight.bold)),
         Text(
           teamName,
-          style: TextStyle(fontSize: 12, color: F1SemanticColors.grey600),
+          style: TextStyle(
+            fontSize: driverName != null ? 12 : 14,
+            color: F1SemanticColors.grey600,
+            fontWeight: driverName != null ? FontWeight.w500 : FontWeight.bold,
+          ),
         ),
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           spacing: 4,
           children: [
-            _getFlagEmoji(driverCountry),
+            getFlagEmoji(driverCountry),
             Text(
               driverCountry,
               style: TextStyle(fontSize: 12, color: F1SemanticColors.grey400),
@@ -265,6 +135,139 @@ class _DetailsStanding extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  CountryFlag getFlagEmoji(String country) {
+    switch (country.toLowerCase()) {
+      case "australie":
+        return CountryFlag.fromCountryCode(
+          "AU",
+          theme: const ImageTheme(
+            shape: RoundedRectangle(4),
+            width: 18,
+            height: 14,
+          ),
+        );
+      case "pays-bas":
+        return CountryFlag.fromCountryCode(
+          "NL",
+          theme: const ImageTheme(
+            shape: RoundedRectangle(4),
+            width: 18,
+            height: 14,
+          ),
+        );
+      case "monaco":
+        return CountryFlag.fromCountryCode(
+          "MC",
+          theme: const ImageTheme(
+            shape: RoundedRectangle(4),
+            width: 18,
+            height: 14,
+          ),
+        );
+      case "espagne":
+        return CountryFlag.fromCountryCode(
+          "ES",
+          theme: const ImageTheme(
+            shape: RoundedRectangle(4),
+            width: 18,
+            height: 14,
+          ),
+        );
+      case "canada":
+        return CountryFlag.fromCountryCode(
+          "CA",
+          theme: const ImageTheme(
+            shape: RoundedRectangle(4),
+            width: 18,
+            height: 14,
+          ),
+        );
+      case 'allemagne':
+        return CountryFlag.fromCountryCode(
+          "DE",
+          theme: const ImageTheme(
+            shape: RoundedRectangle(4),
+            width: 18,
+            height: 14,
+          ),
+        );
+      case 'brésil':
+        return CountryFlag.fromCountryCode(
+          "BR",
+          theme: const ImageTheme(
+            shape: RoundedRectangle(4),
+            width: 18,
+            height: 14,
+          ),
+        );
+      case "italie":
+        return CountryFlag.fromCountryCode(
+          "IT",
+          theme: const ImageTheme(
+            shape: RoundedRectangle(4),
+            width: 18,
+            height: 14,
+          ),
+        );
+
+      case "france":
+        return CountryFlag.fromCountryCode(
+          "FR",
+          theme: const ImageTheme(
+            shape: RoundedRectangle(4),
+            width: 18,
+            height: 14,
+          ),
+        );
+      case "japon":
+        return CountryFlag.fromCountryCode(
+          "JP",
+          theme: const ImageTheme(
+            shape: RoundedRectangle(4),
+            width: 18,
+            height: 14,
+          ),
+        );
+      case "thaïlande":
+        return CountryFlag.fromCountryCode(
+          "TH",
+          theme: const ImageTheme(
+            shape: RoundedRectangle(4),
+            width: 18,
+            height: 14,
+          ),
+        );
+      case "argentine":
+        return CountryFlag.fromCountryCode(
+          "AR",
+          theme: const ImageTheme(
+            shape: RoundedRectangle(4),
+            width: 18,
+            height: 14,
+          ),
+        );
+      case 'nouvelle-zélande':
+        return CountryFlag.fromCountryCode(
+          "NZ",
+          theme: const ImageTheme(
+            shape: RoundedRectangle(4),
+            width: 18,
+            height: 14,
+          ),
+        );
+      case "royaume-uni":
+      default:
+        return CountryFlag.fromCountryCode(
+          "GB",
+          theme: const ImageTheme(
+            shape: RoundedRectangle(4),
+            width: 18,
+            height: 14,
+          ),
+        );
+    }
   }
 }
 

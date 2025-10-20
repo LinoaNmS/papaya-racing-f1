@@ -12,7 +12,7 @@ class StandingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
+    return BlocProvider<StandingsCubit>(
       create: (_) => di.sl<StandingsCubit>()..loadStandings(2025),
       child: const StandingScreenContent(),
     );
