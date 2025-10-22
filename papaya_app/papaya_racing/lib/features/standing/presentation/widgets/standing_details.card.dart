@@ -1,6 +1,9 @@
 import 'package:country_flags/country_flags.dart';
 import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
+import 'package:papaya_racing/features/constructor/presentation/constructor_profile.screen.dart';
+import 'package:papaya_racing/features/driver/presentation/driver_profile.screen.dart';
+import 'package:papaya_racing/features/standing/domain/entities/driver.dart';
 import 'package:papaya_racing/features/standing/presentation/widgets/ranking_standing_badge.widget.dart';
 
 class StandingListTile extends StatelessWidget {
@@ -62,12 +65,41 @@ class StandingListTile extends StatelessWidget {
       colorAccent: colorAccent,
       points: points,
       racesWon: racesWon,
+      driverName: null,
     );
+  }
+
+  void _handleNavigation(BuildContext context) {
+    if (driverName != null) {
+      // Navigation vers le profil du pilote
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => DriverProfilScreen(
+            driver: Driver(
+              driverId: "driverId",
+              permanentNumber: 'permanentNumber',
+              code: 'code',
+              givenName: driverName!,
+              familyName: driverName!,
+              dateOfBirth: "dateOfBirth",
+              url: 'url',
+              nationality: country,
+            ),
+          ),
+        ),
+      );
+    } else {
+      // Navigation vers le profil du constructeur
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) => ConstructorProfileScreen()),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return PRCard.withAccent(
+      onTap: () => _handleNavigation(context),
       accentColor: colorAccent,
       body: [
         Row(
@@ -211,7 +243,6 @@ class _DetailsStanding extends StatelessWidget {
             height: 14,
           ),
         );
-
       case "france":
         return CountryFlag.fromCountryCode(
           "FR",
